@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<jbossesb parameterReloadSecs="5"
+ xmlns="http://anonsvn.labs.jboss.com/labs/jbossesb/trunk/product/etc/schemas/xml/jbossesb-1.0.1.xsd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://anonsvn.labs.jboss.com/labs/jbossesb/trunk/product/etc/schemas/xml/jbossesb-1.0.1.xsd http://anonsvn.jboss.org/repos/labs/labs/jbossesb/trunk/product/etc/schemas/xml/jbossesb-1.0.1.xsd">
+ <providers>
+  <jms-provider connection-factory="ConnectionFactory" name="JMSProvider">
+   <jms-bus busid="conciergeGatewayChannel">
+    <jms-message-filter dest-name="queue/concierge_jms_gateway" dest-type="QUEUE"/>
+   </jms-bus>
+   <jms-bus busid="conciergeESBChannel">
+    <jms-message-filter dest-name="queue/concierge_esb_channel" dest-type="QUEUE"/>
+   </jms-bus>
+   <jms-bus busid="ExtractRequestEsbChannel">
+    <jms-message-filter dest-name="queue/concierge_request_extractor" dest-type="QUEUE"/>
+   </jms-bus>
+   <jms-bus busid="MovieTicketsEsbChannel">
+    <jms-message-filter dest-name="queue/concierge_movie_tickets" dest-type="QUEUE"/>
+   </jms-bus>
+   <jms-bus busid="DinnerReservationsEsbChannel">
+    <jms-message-filter dest-name="queue/concierge_dinner_reservations" dest-type="QUEUE"/>
+   </jms-bus>
+   <jms-bus busid="PrintResultsEsbChannel">
+    <jms-message-filter dest-name="queue/concierge_result_printer" dest-type="QUEUE"/>
+   </jms-bus>
+   <jms-bus busid="PaymentServiceEsbChannel">
+    <jms-message-filter dest-name="queue/concierge_payment_service" dest-type="QUEUE"/>
+   </jms-bus>
+  </jms-provider>
+ </providers>
+ <services>
+  <service category="Concierge_Service"
+   description="Use this service to start a process instance" name="Starter_Service">
+   <listeners>
+    <jms-listener busidref="conciergeGatewayChannel" is-gateway="true" name="JMS-Gateway"/>
+    <jms-listener busidref="conciergeESBChannel" name="ESB-Listener"/>
+   </listeners>
+   <actions mep="OneWay">
+    <!-- THIS CAN BE UNCOMMENTED TO VIEW THE RAW MESSAGE FROM THE JMS QUEUE 
+			<action name="print1" class="org.jboss.soa.esb.actions.SystemPrintln">
+				<property name="printfull" value="true"/>
+			</action>
+            
+ move the body.getContents() into jBPM -->
+    <action class="org.jboss.soa.esb.services.jbpm.actions.BpmProcessor" name="create_new_process_instance">
+     <property name="command" value="StartProcessInstanceCommand"/>
+     <property name="process-definition-name" value="apawar2_ConciergeProcess"/>
+     <property name="esbToBpmVars">
+      <mapping bpm="orginalMessage" esb="BODY_CONTENT"/>
+     </property>
+    </action>
+   </actions>
+  </service>
+  <service category="Concierge_Service"
+   description="this is a service invoked within the process to extract variables from the xml" name="ExtractRequestService">
+   <listeners>
+    <jms-listener busidref="ExtractRequestEsbChannel" name="ESB-Listener"/>
+   </listeners>
+   <actions>
+    <action
+     class="org.jboss.soa.esb.actions.scripting.GroovyActionProcessor" name="groovy">
+     <property name="script" value="scripts/requestExtractor.groovy"/>
+    </action>
+   </actions>
+  </service>
+  <service category="Concierge_Service"
+   description="this is a service invoked within the process to procure movie tickets" name="MovieTicketsService">
+   <listeners>
+    <jms-listener busidref="MovieTicketsEsbChannel" name="ESB-Listener"/>
+   </listeners>
+   <actions>
+    <action class="edu.ncsu.soc.esb.MovieTicketsService" name="procureTickets"/>
+   </actions>
+  </service>
+  <service category="Concierge_Service"
+   description="this is a service invoked within the process to make dinner reservations" name="DinnerReservationsService">
+   <listeners>
+    <jms-listener busidref="DinnerReservationsEsbChannel" name="ESB-Listener"/>
+   </listeners>
+   <actions>
+    <action class="edu.ncsu.soc.esb.DinnerReservationsService" name="dinnerReservations"/>
+   </actions>
+  </service>
+  <service category="Concierge_Service"
+   description="this is a service invoked within the process to print the results of the process" name="PrintResultsService">
+   <listeners>
+    <jms-listener busidref="PrintResultsEsbChannel" name="ESB-Listener"/>
+   </listeners>
+   <actions>
+    <action class="edu.ncsu.soc.esb.ResultPrinter" name="printResults"/>
+   </actions>
+  </service>
+  <service category="Concierge_Service" description="Payment_Service" name="PaymentService">
+   <listeners>
+    <jms-listener busidref="PaymentServiceEsbChannel" name="PaymentService"/>
+   </listeners>
+   <actions>
+    <action class="edu.ncsu.soc.esb.PaymentService" name="PaymentService"/>
+   </actions>
+  </service>
+ </services>
+</jbossesb>

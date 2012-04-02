@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  
+<process-definition name="apawar2_ConciergeProcess">
+   <start-state name="start">
+      <transition to="extractRequest" />
+   </start-state>
+
+   <node name="extractRequest">
+      <action class="org.jboss.soa.esb.services.jbpm.actionhandlers.EsbActionHandler">
+         <esbCategoryName>Concierge_Service</esbCategoryName>
+         <esbServiceName>ExtractRequestService</esbServiceName>
+         <bpmToEsbVars>
+         	<mapping bpm="orginalMessage" esb="BODY_CONTENT" />
+         </bpmToEsbVars>
+         <esbToBpmVars>
+         	<mapping esb="bookTickets" bpm="bookTickets" />
+         	<mapping esb="returnTickets" bpm="returnTickets" />
+         	<mapping esb="movieName" bpm="movieName" />
+         	<mapping esb="reserveDinner" bpm="reserveDinner" />
+         	<mapping esb="cancelDinner" bpm="cancelDinner" />
+         	<mapping esb="customerName" bpm="customerName" ></mapping>
+         	<mapping esb="ticketSucceed" bpm="ticketSucceed" />
+         	<mapping esb="dinnerSucceed" bpm="dinnerSucceed" />
+           <mapping esb="makePayment" bpm="makePayment" />
+           <mapping esb="paySucceed" bpm="paySucceed" />
+           <mapping esb="paySucceeded" bpm="paySucceeded" />
+          
+			
+         		
+         </esbToBpmVars>
+      </action>
+		<transition to="fork1"></transition>
+   </node>
+
+	<node name="Tickets Procurement">
+		<action class="org.jboss.soa.esb.services.jbpm.actionhandlers.EsbActionHandler">
+			<esbCategoryName>Concierge_Service</esbCategoryName>
+			<esbServiceName>MovieTicketsService</esbServiceName>
+			<bpmToEsbVars>
+         	<mapping esb="bookTickets" bpm="bookTickets" />
+         	<mapping esb="returnTickets" bpm="returnTickets" />
+         	<mapping esb="movieName" bpm="movieName" />
+         	<mapping esb="customerName" bpm="customerName" />
+         	<mapping esb="ticketSucceed" bpm="ticketSucceed" />
+         	</bpmToEsbVars>
+			<esbToBpmVars>
+			<mapping bpm="cancelDinner" esb="cancelDinner" />
+         	<mapping bpm="ticketsRefunded" esb="ticketsRefunded" />
+         	<mapping bpm="ticketsBooked" esb="ticketsBooked" />
+         	<mapping bpm="ticketBookingRef" esb="ticketBookingRef" />
+         	</esbToBpmVars>
+		</action>
+		<transition to="join1"></transition>
+	</node>
+
+	<node name="Dinner Reservation">
+		<action class="org.jboss.soa.esb.services.jbpm.actionhandlers.EsbActionHandler">
+			<esbCategoryName>Concierge_Service</esbCategoryName>
+			<esbServiceName>DinnerReservationsService</esbServiceName>
+			<bpmToEsbVars>
+         	<mapping esb="reserveDinner" bpm="reserveDinner" />
+         	<mapping esb="cancelDinner" bpm="cancelDinner" />
+         	<mapping esb="customerName" bpm="customerName" />
+         	<mapping esb="dinnerSucceed" bpm="dinnerSucceed" />
+         	         	
+			</bpmToEsbVars>	
+			<esbToBpmVars>
+         	<mapping bpm="dinnerReserved" esb="dinnerReserved" />
+         	<mapping bpm="dinnerCancelled" esb="dinnerCancelled" />
+         	<mapping bpm="dinnerReservationRef" esb="dinnerReservationRef" />
+         	</esbToBpmVars>		
+		</action>
+		<transition to="join1"></transition>
+	</node>
+
+	<node name="printResults">
+		<action class="org.jboss.soa.esb.services.jbpm.actionhandlers.EsbActionHandler">
+			<esbCategoryName>Concierge_Service</esbCategoryName>
+			<esbServiceName>PrintResultsService</esbServiceName>
+			<bpmToEsbVars>
+         	<mapping esb="bookTickets" bpm="bookTickets" />
+         	<mapping esb="returnTickets" bpm="returnTickets" />
+         	<mapping esb="movieName" bpm="movieName" />
+         	<mapping esb="reserveDinner" bpm="reserveDinner" />
+         	<mapping esb="cancelDinner" bpm="cancelDinner" />
+         	<mapping esb="customerName" bpm="customerName" />
+         	<mapping esb="dinnerSucceed" bpm="dinnerSucceed" />
+         	<mapping esb="ticketsRefunded" bpm="ticketsRefunded" />
+         	<mapping esb="ticketsBooked" bpm="ticketsBooked" />
+         	<mapping esb="dinnerReservationRef" bpm="dinnerReservationRef" />
+			<mapping esb="ticketBookingRef" bpm="ticketBookingRef"  />
+						<mapping esb="makePayment" bpm="makePayment" />
+         	<mapping esb="paySucceeded" bpm="paySucceeded" />
+         	<mapping esb="dinnerReserved" bpm="dinnerReserved" />
+         	<mapping esb="dinnerCancelled" bpm="dinnerCancelled" />
+			</bpmToEsbVars>
+			<esbToBpmVars>
+			<mapping esb="dinnerReservationRef" bpm="dinnerReservationRef" />
+			<mapping esb="ticketBookingRef" bpm="ticketBookingRef" />
+			</esbToBpmVars>
+		</action>
+        <transition to="end"></transition>
+	</node>
+
+	<fork name="fork1">
+		<transition to="Dinner Reservation" name="to Dinner Reservation"></transition>
+		<transition to="Tickets Procurement" name="to Tickets Procurement"></transition>
+	</fork>
+
+	<join name="join1" to="printResults">
+		<transition to="decision1"></transition>
+	</join>
+
+	<node name="Tickets Refund">
+		<action class="org.jboss.soa.esb.services.jbpm.actionhandlers.EsbActionHandler">
+			<esbCategoryName>Concierge_Service</esbCategoryName>
+			<esbServiceName>MovieTicketsService</esbServiceName>
+			<bpmToEsbVars>
+         	<mapping esb="bookTickets" bpm="bookTickets" />
+         	<mapping esb="returnTickets" bpm="true" />
+         	<mapping esb="movieName" bpm="movieName" />
+         	<mapping esb="customerName" bpm="customerName" />
+         	<mapping esb="ticketSucceed" bpm="ticketSucceed" />
+         	<mapping esb="ticketBookingRef" bpm="ticketBookingRef" />
+         	
+			</bpmToEsbVars>
+			<esbToBpmVars>
+         	<mapping bpm="ticketsRefunded" esb="ticketsRefunded" />
+         	<mapping bpm="ticketsBooked" esb="ticketsBooked" />
+         	<mapping bpm="ticketBookingRef" esb="ticketBookingRef" />
+         	</esbToBpmVars>
+		</action>
+		<transition to="decision4"></transition>
+	</node>
+
+	<node name="Payment Service">
+		<action class="org.jboss.soa.esb.services.jbpm.actionhandlers.EsbActionHandler">
+			<esbCategoryName>Concierge_Service</esbCategoryName>
+			<esbServiceName>PaymentService</esbServiceName>
+			<bpmToEsbVars>
+         	<mapping esb="makePayment" bpm="makePayment" />
+         	<mapping esb="paySucceed" bpm="paySucceed" />
+         	<mapping esb="returnTickets" bpm="returnTickets" />
+         	<mapping esb="cancelDinner" bpm="cancelDinner" />
+         	
+         	</bpmToEsbVars>
+			<esbToBpmVars>
+         	<mapping bpm="paySucceeded" esb="paySucceeded" />
+         	</esbToBpmVars></action>
+		<transition to="decision2"></transition>
+	</node>
+
+	<decision name="decision1">
+	
+	<esbToBpmVars>
+	<mapping bpm="ticketsBooked" esb="ticketsBooked" />
+    <mapping bpm="dinnerReserved" esb="dinnerReserved" ></mapping>
+            	
+         	</esbToBpmVars>
+         	
+		<transition to="Payment Service" name="to Payment Service">
+		<condition expression ="#{ticketsBooked== 'true' and dinnerReserved== 'true'}" />
+		</transition>
+		<transition to="Cancel Dinner Reservation" name="to Cancel Dinner Reservation">
+		<condition expression ="#{ticketsBooked== 'false' and dinnerReserved== 'true'}"/>
+		</transition>
+		<transition to="printResults" name="to printResults">
+		<condition expression ="#{ticketsBooked== 'false' and dinnerReserved== 'false'}"/>
+		</transition>
+		<transition to="Tickets Refund" name="to Cancel Movie Tickets">
+		<condition expression ="#{ticketsBooked== 'true' and dinnerReserved== 'false'}"/>
+		</transition>
+		<transition to="Cancel Dinner Reservation">
+		<condition expression ="#{returnTickets== 'true' and dinnerReserved== 'true'}"/>
+		</transition>
+		<transition to="Tickets Refund">
+		<condition expression ="#{cancelDinner== 'true' and ticketsBooked== 'true'}"/>
+		</transition>
+		<transition to="printResults">
+		<condition expression ="#{cancelDinner== 'true' and returnTickets== 'true'}"/>
+		</transition>
+		<transition to="printResults">
+		<condition expression ="#{dinnerReserved== 'false' and returnTickets== 'true'}"/>
+		</transition>
+		<transition to="printResults">
+		<condition expression ="#{cancelDinner== 'true' and ticketsBooked== 'false'}"/>
+		</transition>
+	</decision>
+
+	<node name="Cancel Dinner Reservation">
+		<action class="org.jboss.soa.esb.services.jbpm.actionhandlers.EsbActionHandler">
+		<esbCategoryName>Concierge_Service</esbCategoryName>
+		<esbServiceName>DinnerReservationsService</esbServiceName>
+		<bpmToEsbVars>
+         	<mapping esb="reserveDinner" bpm="reserveDinner" />
+         	<mapping esb="cancelDinner" bpm="true" />
+         	<mapping esb="customerName" bpm="customerName" />
+         	<mapping esb="dinnerSucceed" bpm="dinnerSucceed" />
+         	<mapping bpm="dinnerReservationRef" esb="dinnerReservationRef" />
+			</bpmToEsbVars>	
+			<esbToBpmVars>
+         	<mapping bpm="dinnerReserved" esb="dinnerReserved" />
+         	<mapping bpm="dinnerCancelled" esb="dinnerCancelled" />
+         	<mapping bpm="dinnerReservationRef" esb="dinnerReservationRef" />
+         	</esbToBpmVars>		
+         	</action>
+		<transition to="decision3" name="to printResults"></transition>
+	</node>
+
+	<decision name="decision2">
+	<esbToBpmVars>
+	<mapping esb="paySucceeded" bpm="paySucceeded"></mapping>
+	</esbToBpmVars>
+		<transition to="paymentSuccess">
+		<condition expression = "#{paySucceeded=='true'}"/></transition>
+		<transition to="fork2" name="to paymentFailed">
+		<condition expression = "#{paySucceeded=='false'}"/></transition>
+	</decision>
+
+	<node name="paymentSuccess">
+		<action class="org.jboss.soa.esb.services.jbpm.actionhandlers.EsbActionHandler">
+		<esbCategoryName>Concierge_Service</esbCategoryName>
+		<esbServiceName>PaymentService</esbServiceName></action>
+		<transition to="printResults"></transition>
+	</node>
+
+	<fork name="fork2">
+		<transition to="Tickets Refund"></transition>
+		<transition to="Cancel Dinner Reservation" name="to Cancel Dinner Reservation"></transition>
+	</fork>
+
+	<join name="join2">
+		<transition to="printResults"></transition>
+	</join>
+
+	<decision name="decision3">
+	<esbToBpmVars>
+	<mapping esb="returnTickets" bpm="returnTickets" />
+	<mapping esb="ticketSucceed" bpm="ticketSucceed" />
+	</esbToBpmVars>
+	<transition to="printResults"><condition expression = "#{ticketSucceed=='false' or returnTickets=='true'}"/></transition>
+		<transition to="join2">
+		<condition expression = "#{ticketSucceed=='true'}"/></transition>
+		
+	</decision>
+
+	<decision name="decision4">
+	<esbToBpmVars>
+	<mapping esb="cancelDinner" bpm="cancelDinner" />
+	<mapping esb="dinnerSucceed" bpm="dinnerSucceed" />
+	</esbToBpmVars>
+		<transition to="printResults"><condition expression = "#{dinnerSucceed=='false' or cancelDinner=='true'}"/></transition>
+		<transition to="join2" name="to join2"><condition expression = "#{dinnerSucceed=='true'}"/></transition>
+	</decision>
+	<end-state name="end"></end-state>
+</process-definition>

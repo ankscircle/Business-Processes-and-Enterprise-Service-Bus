@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server>
+
+  <mbean code="org.jboss.jms.server.destination.QueueService"
+    name="edu.ncsu.soc.esb.destination:service=Queue,name=concierge_jms_gateway"
+    xmbean-dd="xmdesc/Queue-xmbean.xml">
+    <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+	<depends>jboss.messaging:service=PostOffice</depends>
+  </mbean>
+
+  <mbean code="org.jboss.jms.server.destination.QueueService"
+    name="edu.ncsu.soc.esb.destination:service=Queue,name=concierge_esb_channel"
+    xmbean-dd="xmdesc/Queue-xmbean.xml">
+    <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+	<depends>jboss.messaging:service=PostOffice</depends>
+  </mbean>
+
+  <mbean code="org.jboss.jms.server.destination.QueueService"
+    name="edu.ncsu.soc.esb.destination:service=Queue,name=concierge_request_extractor"
+    xmbean-dd="xmdesc/Queue-xmbean.xml">
+    <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+	<depends>jboss.messaging:service=PostOffice</depends>
+  </mbean>
+  <mbean code="org.jboss.jms.server.destination.QueueService"
+    name="edu.ncsu.soc.esb.destination:service=Queue,name=concierge_dinner_reservations"
+    xmbean-dd="xmdesc/Queue-xmbean.xml">
+    <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+	<depends>jboss.messaging:service=PostOffice</depends>
+  </mbean>
+    <mbean code="org.jboss.jms.server.destination.QueueService"
+    name="edu.ncsu.soc.esb.destination:service=Queue,name=concierge_movie_tickets"
+    xmbean-dd="xmdesc/Queue-xmbean.xml">
+    <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+	<depends>jboss.messaging:service=PostOffice</depends>
+  </mbean>
+  <mbean code="org.jboss.jms.server.destination.QueueService"
+    name="edu.ncsu.soc.esb.destination:service=Queue,name=concierge_result_printer"
+    xmbean-dd="xmdesc/Queue-xmbean.xml">
+    <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+	<depends>jboss.messaging:service=PostOffice</depends>
+  </mbean>
+  <mbean code="org.jboss.jms.server.destination.QueueService"
+    name="edu.ncsu.soc.esb.destination:service=Queue,name=concierge_payment_service"
+    xmbean-dd="xmdesc/Queue-xmbean.xml">
+    <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+	<depends>jboss.messaging:service=PostOffice</depends>
+  </mbean>
+
+</server>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jbossesb-deployment>
+  <depends>jboss.esb:deployment=jbpm.esb</depends>
+  <depends>edu.ncsu.soc.esb.destination:service=Queue,name=concierge_jms_gateway</depends>
+  <depends>edu.ncsu.soc.esb.destination:service=Queue,name=concierge_esb_channel</depends>
+  <depends>edu.ncsu.soc.esb.destination:service=Queue,name=concierge_request_extractor</depends>
+  <depends>edu.ncsu.soc.esb.destination:service=Queue,name=concierge_dinner_reservations</depends>
+  <depends>edu.ncsu.soc.esb.destination:service=Queue,name=concierge_movie_tickets</depends>
+  <depends>edu.ncsu.soc.esb.destination:service=Queue,name=concierge_result_printer</depends>
+  <depends>edu.ncsu.soc.esb.destination:service=Queue,name=concierge_payment_service</depends>
+</jbossesb-deployment>
